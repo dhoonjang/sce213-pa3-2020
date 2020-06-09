@@ -136,6 +136,7 @@ void acquire_mutex(struct mutex *mutex)
 	mutex->S--;
 	if (mutex->S < 0)
 	{
+		printf("\n\nhaha\n\n");
 		new->pthread = pthread_self();
 		list_add(&new->list, &mutex->Q);
 
