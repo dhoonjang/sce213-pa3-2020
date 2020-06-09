@@ -103,6 +103,7 @@ struct mutex
  */
 void init_mutex(struct mutex *mutex)
 {
+	mutex->S = 0;
 	return;
 }
 
@@ -131,22 +132,27 @@ void acquire_mutex(struct mutex *mutex)
 	sigset_t mask;
 	siginfo_t info;
 	struct thread *new;
-	new->pthread = pthread_self();
-	list_add(&new->list, &mutex->head->list);
 
-	sigemptyset(&mask);
-	sigaddset(&mask, 77);
-	sigprocmask(SIG_BLOCK, &mask, NULL);
-	printf("sss\n");
-	while (1)
+	mutex->S--;
+	if (mutex->S < 0)
 	{
-		if (sigwaitinfo(&mask, &info) == -1)
+		new->pthread = pthread_self();
+		list_add(&new->list, &mutex->head->list);
+
+		sigemptyset(&mask);
+		sigaddset(&mask, 77);
+		sigprocmask(SIG_BLOCK, &mask, NULL);
+
+		while (1)
 		{
-			continue;
-		}
-		if (info.si_signo == 77)
-		{
-			break;
+			if (sigwaitinfo(&mask, &info) == -1)
+			{
+				continue;
+			}
+			if (info.si_signo == 77)
+			{
+				break;
+			}
 		}
 	}
 
@@ -166,9 +172,14 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
-	next = list_first_entry(&mutex->head->list, struct thread, list);
-	list_del_init(&next->list);
-	pthread_kill(next->pthread, 77);
+	mutex->S++;
+
+	if (mutex->S <= 0)
+	{
+		next = list_first_entry(&mutex->head->list, struct thread, list);
+		list_del_init(&next->list);
+		pthread_kill(next->pthread, 77);
+	}
 	return;
 }
 
