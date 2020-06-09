@@ -105,8 +105,8 @@ struct mutex
 LIST_HEAD(readyqueue);
 void init_mutex(struct mutex *mutex)
 {
-	mutex->Q = readyqueue;
-
+	struct list_head *head = &mutex->Q;
+	head->next = head;
 	printf("\nstart %d\n", list_empty(&mutex->Q));
 
 	mutex->S = 1;
