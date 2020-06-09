@@ -102,11 +102,11 @@ struct mutex
  *   Initialize the mutex instance pointed by @mutex.
  */
 
-LIST_HEAD(readyqueue);
 void init_mutex(struct mutex *mutex)
 {
 	struct list_head *head = &mutex->Q;
 	head->next = head;
+	head->prev = head;
 	printf("\nstart %d\n", list_empty(&mutex->Q));
 
 	mutex->S = 1;
@@ -137,6 +137,10 @@ void init_mutex(struct mutex *mutex)
 void print_thread(struct mutex *mutex)
 {
 	struct thread *t;
+	list_for_each_entry(t, &mutex->Q, list)
+	{
+		printf("\n%d", t->pthread);
+	}
 	printf("\nS: %d\n", mutex->S);
 	return;
 }
@@ -147,13 +151,11 @@ void acquire_mutex(struct mutex *mutex)
 	siginfo_t info;
 	pthread_t pt;
 	struct thread *new = malloc(sizeof(struct thread));
-
-	printf("\nS: %d\n", mutex->S);
+	print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
 		new->pthread = pthread_self();
-
 		list_add_tail(&new->list, &mutex->Q);
 
 		sigwait(&mask, NULL);
@@ -176,6 +178,7 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
+	print_thread(mutex);
 	mutex->S++;
 	if (mutex->S <= 0)
 	{
