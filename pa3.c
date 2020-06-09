@@ -149,18 +149,7 @@ void acquire_mutex(struct mutex *mutex)
 		list_add_tail(&new->list, &mutex->Q);
 
 		printf("\ntail\n");
-		while (1)
-		{
-			if (sigwaitinfo(&mask, &info) == -1)
-			{
-				continue;
-			}
-			printf("\nfinish\n");
-			if (info.si_signo == 77)
-			{
-				break;
-			}
-		}
+		sigwaitinfo(&mask, &info);
 	}
 
 	return;
@@ -181,11 +170,15 @@ void release_mutex(struct mutex *mutex)
 	struct thread *next;
 	mutex->S++;
 
-	printf("\n%d\n", mutex->S);
 	if (mutex->S <= 0)
 	{
+		if (list_empty(&mutex->Q))
+		{
+			printf("\nhell\n");
+		}
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
+		printf("\n%d\n", mutex->S);
 		pthread_kill(next->pthread, 77);
 	}
 	return;
