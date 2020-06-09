@@ -149,10 +149,6 @@ void acquire_mutex(struct mutex *mutex)
 	list_for_each_entry(t, &mutex->Q, list)
 	{
 		printf("\nthread: %d", t->pthread);
-		if (list_is_last(&t->list, &mutex->Q))
-		{
-			break;
-		}
 	}
 
 	printf("\nS: %d\n", mutex->S);
