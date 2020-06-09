@@ -142,11 +142,11 @@ void acquire_mutex(struct mutex *mutex)
 		sigprocmask(SIG_BLOCK, &mask, NULL);
 
 		new->pthread = pthread_self();
+		printf("\n\nhaha\n\n");
 		list_add_tail(&new->list, &mutex->Q);
 
 		while (1)
 		{
-			printf("\n\nhaha\n\n");
 			if (sigwaitinfo(&mask, &info) == -1)
 			{
 				continue;
