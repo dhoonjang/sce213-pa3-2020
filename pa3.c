@@ -32,8 +32,9 @@
 /*********************************************************************
  * Spinlock implementation
  *********************************************************************/
-struct spinlock {
-
+struct spinlock
+{
+	bool isLock;
 };
 
 /*********************************************************************
@@ -44,6 +45,8 @@ struct spinlock {
  */
 void init_spinlock(struct spinlock *lock)
 {
+	lock->isLock = false;
+
 	return;
 }
 
@@ -58,6 +61,10 @@ void init_spinlock(struct spinlock *lock)
  */
 void acquire_spinlock(struct spinlock *lock)
 {
+	while (lock->isLock)
+		;
+	lock->isLock = true;
+
 	return;
 }
 
@@ -72,20 +79,21 @@ void acquire_spinlock(struct spinlock *lock)
  */
 void release_spinlock(struct spinlock *lock)
 {
+	lock->isLock = false;
 	return;
 }
-
 
 /********************************************************************
  * Blocking mutex implementation
  ********************************************************************/
-struct thread {
+struct thread
+{
 	pthread_t pthread;
 	struct list_head list;
 };
 
-struct mutex {
-
+struct mutex
+{
 };
 
 /*********************************************************************
@@ -124,7 +132,6 @@ void acquire_mutex(struct mutex *mutex)
 	return;
 }
 
-
 /*********************************************************************
  * release_mutex(@mutex)
  *
@@ -140,20 +147,18 @@ void release_mutex(struct mutex *mutex)
 	return;
 }
 
-
-
 /*********************************************************************
  * Ring buffer
  *********************************************************************/
-struct ringbuffer {
+struct ringbuffer
+{
 	/** NEVER CHANGE @nr_slots AND @slots ****/
-	/**/ int nr_slots;                     /**/
-	/**/ int *slots;                       /**/
-	/*****************************************/
+	/**/ int nr_slots; /**/
+	/**/ int *slots;	 /**/
+										 /*****************************************/
 };
 
-struct ringbuffer ringbuffer = {
-};
+struct ringbuffer ringbuffer = {};
 
 /*********************************************************************
  * enqueue_into_ringbuffer(@value)
@@ -164,7 +169,6 @@ struct ringbuffer ringbuffer = {
 void enqueue_into_ringbuffer(int value)
 {
 }
-
 
 /*********************************************************************
  * dequeue_from_ringbuffer(@value)
@@ -179,7 +183,6 @@ int dequeue_from_ringbuffer(void)
 {
 	return 0;
 }
-
 
 /*********************************************************************
  * fini_ringbuffer
@@ -205,8 +208,8 @@ void fini_ringbuffer(void)
 int init_ringbuffer(const int nr_slots)
 {
 	/** DO NOT MODIFY THOSE TWO LINES **************************/
-	/**/ ringbuffer.nr_slots = nr_slots;                     /**/
-	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots);  /**/
+	/**/ ringbuffer.nr_slots = nr_slots;										/**/
+	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots); /**/
 	/***********************************************************/
 
 	return 0;

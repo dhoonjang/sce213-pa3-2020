@@ -40,40 +40,51 @@ const int nr_testers = 4;
 /* Wrapper functions to locks */
 static inline const char *__lock_type(void)
 {
-	if (lock_type == lock_spinlock) {
+	if (lock_type == lock_spinlock)
+	{
 		return "spinlock";
-	} else if (lock_type == lock_mutex) {
+	}
+	else if (lock_type == lock_mutex)
+	{
 		return "mutex";
 	}
 }
 
 static inline void __lock(void)
 {
-	if (lock_type == lock_spinlock) {
+	if (lock_type == lock_spinlock)
+	{
 		acquire_spinlock(testlock);
-	} else if (lock_type == lock_mutex) {
+	}
+	else if (lock_type == lock_mutex)
+	{
 		acquire_mutex(testlock);
 	}
 }
 
 static inline void __unlock(void)
 {
-	if (lock_type == lock_spinlock) {
+	if (lock_type == lock_spinlock)
+	{
 		release_spinlock(testlock);
-	} else if (lock_type == lock_mutex) {
+	}
+	else if (lock_type == lock_mutex)
+	{
 		release_mutex(testlock);
 	}
 }
 
 static inline void __init_lock(void)
 {
-	if (lock_type == lock_spinlock) {
+	if (lock_type == lock_spinlock)
+	{
 		init_spinlock(testlock);
-	} else if (lock_type == lock_mutex) {
+	}
+	else if (lock_type == lock_mutex)
+	{
 		init_mutex(testlock);
 	}
 }
-
 
 static int hold_duration_usec = 0;
 static int progress = 0;
@@ -86,12 +97,14 @@ static void *test_thread(void *_arg_)
 	pthread_barrier_wait(&barrier);
 
 	/* Doing test #1 to #4 */
-	while (keep_testing) {
+	while (keep_testing)
+	{
 		__lock();
 
 		assert(testlock_held == 0);
 		testlock_held = 1;
-		if (hold_duration_usec) usleep(hold_duration_usec);
+		if (hold_duration_usec)
+			usleep(hold_duration_usec);
 
 		nr_tested++;
 
@@ -100,7 +113,8 @@ static void *test_thread(void *_arg_)
 		assert(testlock_held == 0);
 
 		__unlock();
-		if (hold_duration_usec) usleep(hold_duration_usec);
+		if (hold_duration_usec)
+			usleep(hold_duration_usec);
 	}
 
 	/* Do test #5 */
@@ -108,7 +122,8 @@ static void *test_thread(void *_arg_)
 
 	usleep(id * 10000);
 	__lock();
-	if (id != progress++) {
+	if (id != progress++)
+	{
 		lock_in_order = false;
 	}
 	__print_message("   %ld acquired the lock\n", id);
@@ -124,7 +139,8 @@ static bool is_busywaiting(void)
 	struct rusage usage;
 
 	__lock();
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++)
+	{
 		__print_message(".");
 		sleep(1);
 	}
@@ -162,7 +178,8 @@ void test_lock(enum lock_types _lock_type_)
 	assert(testlock_held == 0);
 	testlock_held = 1;
 
-	for (int i = 0; i < nr_testers; i++) {
+	for (int i = 0; i < nr_testers; i++)
+	{
 		pthread_create(tester + i, NULL, test_thread, (void *)(long)i);
 	}
 	pthread_barrier_wait(&barrier); /* Wait until test threads are ready */
@@ -174,19 +191,18 @@ void test_lock(enum lock_types _lock_type_)
 	__unlock();
 	__print_message("  [Done]\n");
 
-
 	/*********************************************************
 	 * Testing threads keep torturing the lock for @testing_duration_sec.
 	 */
 	__print_message("2. Verify the mutual exclusiveness further");
-	for (int i = 0; i < testing_duration_sec; i++) {
+	for (int i = 0; i < testing_duration_sec; i++)
+	{
 		sleep(1);
 		__print_message(".");
 	}
 	__print_message("  [Done]\n");
 	fprintf(stderr, "   Performance: %lu operations/sec\n",
-			nr_tested / testing_duration_sec);
-
+					nr_tested / testing_duration_sec);
 
 	/*********************************************************
 	 * Testing possible-race condition.
@@ -194,39 +210,42 @@ void test_lock(enum lock_types _lock_type_)
 	 */
 	__print_message("3. Check race condition during waking up.......");
 	hold_duration_usec = 1;
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 100; i++)
+	{
 		__lock();
 		usleep(hold_duration_usec);
 		__unlock();
 	}
 	__print_message("  [Done]\n");
 
-
 	__print_message("4. Analyze lock waiting policy....");
 	ret = is_busywaiting();
 	__print_message("             [Done]\n");
 	fprintf(stderr, "   Seem to be a %s lock\n",
-			ret ? "busy-waiting" : "blocking");
+					ret ? "busy-waiting" : "blocking");
 	assert((lock_type == lock_spinlock && ret == true) ||
-		   (lock_type == lock_mutex && ret == false));
+				 (lock_type == lock_mutex && ret == false));
 
 	keep_testing = false;
-
 
 	__print_message("5. Analyze the lock waiting order...\n");
 	pthread_barrier_wait(&barrier);
 
 	pthread_barrier_wait(&barrier);
 	fprintf(stderr, "   Waiting %s\n",
-			lock_in_order ? "in order" : "out of order");
+					lock_in_order ? "in order" : "out of order");
 
-	for (int i = 0; i < nr_testers; i++) {
+	for (int i = 0; i < nr_testers; i++)
+	{
 		pthread_join(tester[i], NULL);
 	}
 	assert(testlock_held == 0);
-	if (lock_type == lock_spinlock || (lock_type == lock_mutex && lock_in_order)) {
+	if (lock_type == lock_spinlock || (lock_type == lock_mutex && lock_in_order))
+	{
 		fprintf(stderr, "\n >>>> Congraturations! Your %s implementation looks great!! <<<<\n\n", __lock_type());
-	} else {
+	}
+	else
+	{
 		assert(0 && "wrong lock wait ordering for mutex");
 	}
 
