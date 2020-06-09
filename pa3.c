@@ -102,10 +102,9 @@ struct mutex
  *   Initialize the mutex instance pointed by @mutex.
  */
 
-LIST_HEAD(queue);
-
 void init_mutex(struct mutex *mutex)
 {
+	LIST_HEAD(queue);
 	mutex->Q = queue;
 	mutex->S = 1;
 	return;
