@@ -131,7 +131,6 @@ void acquire_mutex(struct mutex *mutex)
 	sigset_t mask;
 	siginfo_t info;
 	struct thread *new;
-	struct thread *next;
 	new->pthread = pthread_self();
 	list_add_tail(&new->list, &mutex->head->list);
 
@@ -153,9 +152,6 @@ void acquire_mutex(struct mutex *mutex)
 		}
 	}
 
-	next = list_first_entry(&mutex->head->list, struct thread, list);
-	mutex->t->pthread = next->pthread;
-
 	return;
 }
 
@@ -171,7 +167,10 @@ void acquire_mutex(struct mutex *mutex)
  */
 void release_mutex(struct mutex *mutex)
 {
-	pthread_kill(&mutex->t->pthread, 77);
+	struct thread *next;
+	next = list_first_entry(&mutex->head->list, struct thread, list);
+	list_del_init(&next->list);
+	pthread_kill(&next->pthread, 77);
 	return;
 }
 
