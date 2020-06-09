@@ -159,6 +159,7 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
+		printf("\nadd: %d", new->pthread);
 		sigwait(&mask, NULL);
 		printf("\nacquire end\n");
 	}
