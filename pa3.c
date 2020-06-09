@@ -165,7 +165,6 @@ void acquire_mutex(struct mutex *mutex)
 		while (1)
 		{
 			sigwait(&mask, &sig_no);
-			printf("\n%d", sig_no);
 			if (sig_no == SIGINT)
 			{
 				break;
