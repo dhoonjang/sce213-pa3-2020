@@ -34,7 +34,7 @@
  *********************************************************************/
 struct spinlock
 {
-	int *held;
+	int held;
 };
 
 /*********************************************************************
@@ -60,7 +60,7 @@ void init_spinlock(struct spinlock *l)
  */
 void acquire_spinlock(struct spinlock *l)
 {
-	while (compare_and_swap(l->held, 0, 1))
+	while (compare_and_swap(&l->held, 0, 1))
 		;
 	return;
 }
