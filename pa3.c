@@ -147,7 +147,6 @@ void acquire_mutex(struct mutex *mutex)
 
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
-		printf("\n\nhaha\n\n");
 
 		while (1)
 		{
@@ -155,6 +154,7 @@ void acquire_mutex(struct mutex *mutex)
 			{
 				continue;
 			}
+			printf("\n%d\n", info.si_signo);
 			if (info.si_signo == 77)
 			{
 				break;
@@ -185,6 +185,7 @@ void release_mutex(struct mutex *mutex)
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		pthread_kill(next->pthread, 77);
+		printf("\nkill\n");
 	}
 	return;
 }
