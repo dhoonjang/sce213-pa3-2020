@@ -155,9 +155,9 @@ void acquire_mutex(struct mutex *mutex)
 			{
 				continue;
 			}
+			printf("\nfinish\n");
 			if (info.si_signo == 77)
 			{
-				printf("\nfinish\n");
 				break;
 			}
 		}
