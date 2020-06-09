@@ -184,7 +184,7 @@ void release_mutex(struct mutex *mutex)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		printf("\kill\n");
+		printf("\nkill\n");
 		pthread_kill(next->pthread, 77);
 	}
 	return;
