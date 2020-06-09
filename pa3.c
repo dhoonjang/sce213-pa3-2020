@@ -152,8 +152,8 @@ void acquire_mutex(struct mutex *mutex)
 	// siginfo_t info;
 	pthread_t pt;
 	struct thread *new = malloc(sizeof(struct thread));
-	printf("\n\n//acquire//");
-	print_thread(mutex);
+	// printf("\n\n//acquire//");
+	// print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
@@ -163,9 +163,9 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
-		printf("\nadd: %d", new->pthread);
+		// printf("\nadd: %d", new->pthread);
 		sigwait(&mask, &sig_no);
-		printf("\nacquire end\n");
+		// printf("\nacquire end\n");
 	}
 
 	return;
@@ -184,16 +184,16 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
-	printf("\n\n//release//");
+	// printf("\n\n//release//");
 	print_thread(mutex);
 	mutex->S++;
 	if (mutex->S <= 0)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		printf("\nkill-thread: %d\n", next->pthread);
+		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
-		printf("\nrelease end\n");
+		// printf("\nrelease end\n");
 	}
 	return;
 }
