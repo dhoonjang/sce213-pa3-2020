@@ -135,6 +135,18 @@ void init_mutex(struct mutex *mutex)
 void print_thread(struct mutex *mutex)
 {
 	struct thread *t;
+	printf("\nS: %d\n", mutex->S);
+	return;
+}
+
+void acquire_mutex(struct mutex *mutex)
+{
+	sigset_t mask;
+	siginfo_t info;
+	pthread_t pt;
+	struct thread *t;
+	struct thread *new = malloc(sizeof(struct thread));
+
 	list_for_each_entry(t, &mutex->Q, list)
 	{
 		printf("\nthread: %d", t->pthread);
@@ -143,17 +155,6 @@ void print_thread(struct mutex *mutex)
 			break;
 		}
 	}
-	printf("\nS: %d\n", mutex->S);
-}
-
-void acquire_mutex(struct mutex *mutex)
-{
-	sigset_t mask;
-	siginfo_t info;
-	pthread_t pt;
-	struct thread *new = malloc(sizeof(struct thread));
-
-	print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
@@ -181,8 +182,6 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
-
-	print_thread(mutex);
 	mutex->S++;
 	if (mutex->S <= 0)
 	{
