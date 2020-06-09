@@ -136,7 +136,6 @@ void acquire_mutex(struct mutex *mutex)
 
 	sigemptyset(&mask);
 	sigaddset(&mask, 77);
-	sigprocmask(SIG_BLOCK, &mask, NULL);
 
 	while (1)
 	{
@@ -146,7 +145,6 @@ void acquire_mutex(struct mutex *mutex)
 		}
 		if (info.si_signo == 77)
 		{
-
 			break;
 		}
 	}
