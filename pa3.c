@@ -142,15 +142,12 @@ void acquire_mutex(struct mutex *mutex)
 	printf("\nlock: %d\n", mutex->S);
 	if (mutex->S < 0)
 	{
-		sigemptyset(&mask);
-		sigaddset(&mask, 77);
-		// sigprocmask(SIG_BLOCK, &mask, NULL);
-
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
-		sigwaitinfo(&mask, &info);
-		printf("\ntail\n");
+		printf("\nacquire-thread: %d\n", new->pthread);
+		sigwait(&mask, NULL);
+		printf("\nacquire end\n");
 	}
 
 	return;
@@ -180,8 +177,9 @@ void release_mutex(struct mutex *mutex)
 		}
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
+		printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, 77);
-		printf("\nend\n");
+		printf("\nrelease end\n");
 	}
 	return;
 }
