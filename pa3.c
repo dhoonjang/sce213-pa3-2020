@@ -151,6 +151,7 @@ void acquire_mutex(struct mutex *mutex)
 	siginfo_t info;
 	pthread_t pt;
 	struct thread *new = malloc(sizeof(struct thread));
+	printf("\n//acquire//");
 	print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
@@ -178,6 +179,7 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
+	printf("\n//release//");
 	print_thread(mutex);
 	mutex->S++;
 	if (mutex->S <= 0)
