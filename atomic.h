@@ -31,11 +31,11 @@
  */
 static inline int compare_and_swap(int *value, int old, int new)
 {
-	__asm__ volatile (
-		"lock ; cmpxchg %3, %1"
+	__asm__ volatile(
+			"lock ; cmpxchg %3, %1"
 			: "=a"(old), "=m"(*value)
 			: "a"(old), "r"(new)
-			: "memory" );
+			: "memory");
 	return old;
 }
 #endif

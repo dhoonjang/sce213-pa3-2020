@@ -34,8 +34,7 @@
  *********************************************************************/
 struct spinlock
 {
-	bool interested[2];
-	int turn;
+	int held;
 };
 
 /*********************************************************************
@@ -44,11 +43,9 @@ struct spinlock
  * DESCRIPTION
  *   Initialize your spinlock instance @lock
  */
-void init_spinlock(struct spinlock *lock)
+void init_spinlock(struct spinlock *l)
 {
-	lock->interested[0] = false;
-	lock->interested[1] = false;
-	lock->turn = 0;
+	l->held = 0;
 	return;
 }
 
@@ -61,12 +58,9 @@ void init_spinlock(struct spinlock *lock)
  *   In other words, you should not return from this function until
  *   the calling thread gets the lock.
  */
-void acquire_spinlock(struct spinlock *lock)
+void acquire_spinlock(struct spinlock *l)
 {
-	int other = 1 - lock->turn;
-	lock->interested[lock->turn] = true;
-	lock->turn = other;
-	while (lock->interested[other] && lock->turn == other)
+	while (compare_and_swap(l->held, 0, 1))
 		;
 	return;
 }
@@ -80,9 +74,9 @@ void acquire_spinlock(struct spinlock *lock)
  *   any pending thread may grap @lock right after marking @lock as free
  *   but before returning from this function.
  */
-void release_spinlock(struct spinlock *lock)
+void release_spinlock(struct spinlock *l)
 {
-	lock->interested[lock->turn] = false;
+	l->held = 0;
 	return;
 }
 
