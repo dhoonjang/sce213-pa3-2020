@@ -140,8 +140,8 @@ void acquire_mutex(struct mutex *mutex)
 		sigaddset(&mask, 77);
 		sigprocmask(SIG_BLOCK, &mask, NULL);
 
+		pthread_self();
 		printf("\n\nhaha\n\n");
-		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
 		while (1)
