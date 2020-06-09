@@ -170,7 +170,7 @@ void release_mutex(struct mutex *mutex)
 	struct thread *next;
 	next = list_first_entry(&mutex->head->list, struct thread, list);
 	list_del_init(&next->list);
-	pthread_kill(&next->pthread, 77);
+	pthread_kill(next->pthread, 77);
 	return;
 }
 
