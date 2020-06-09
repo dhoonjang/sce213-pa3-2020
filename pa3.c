@@ -106,10 +106,9 @@ LIST_HEAD(readyqueue);
 void init_mutex(struct mutex *mutex)
 {
 	mutex->Q = readyqueue;
-	if (list_is_empty(mutex->Q))
-	{
-		printf("\nstart\n");
-	}
+
+	printf("\nstart %d\n", list_empty(&mutex->Q));
+
 	mutex->S = 1;
 	return;
 }
