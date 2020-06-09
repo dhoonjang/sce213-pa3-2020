@@ -159,6 +159,7 @@ void acquire_mutex(struct mutex *mutex)
 	{
 		sigemptyset(&mask);
 		sigaddset(&mask, SIGINT);
+		sigprocmask(SIGINT, &mask, NULL);
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
