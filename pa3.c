@@ -158,12 +158,12 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
-		sigemptyset(&mask);
-		sigaddset(&mask, SIGINT);
-		sigprocmask(SIG_BLOCK, &mask, NULL);
 		// printf("\nadd: %d", new->pthread);
 		while (1)
 		{
+			sigemptyset(&mask);
+			sigaddset(&mask, SIGINT);
+			sigprocmask(SIG_BLOCK, &mask, NULL);
 			sigwait(&mask, &sig_no);
 			if (sig_no == SIGINT)
 			{
