@@ -151,12 +151,12 @@ void acquire_mutex(struct mutex *mutex)
 	int sig_no;
 	struct thread *new = malloc(sizeof(struct thread));
 	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
 	// printf("\n\n//acquire//");
 	// print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
-		sigaddset(&mask, SIGINT);
 		sigprocmask(SIGINT, &mask, NULL);
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
