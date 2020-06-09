@@ -146,6 +146,7 @@ void acquire_mutex(struct mutex *mutex)
 
 		while (1)
 		{
+			printf("\n\nhaha\n\n");
 			if (sigwaitinfo(&mask, &info) == -1)
 			{
 				continue;
