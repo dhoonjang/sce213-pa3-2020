@@ -150,11 +150,11 @@ void acquire_mutex(struct mutex *mutex)
 
 		while (1)
 		{
+			printf("\n%d\n", info.si_signo);
 			if (sigwaitinfo(&mask, &info) == -1)
 			{
 				continue;
 			}
-			printf("\n%d\n", info.si_signo);
 			if (info.si_signo == 77)
 			{
 				break;
@@ -182,10 +182,10 @@ void release_mutex(struct mutex *mutex)
 
 	if (mutex->S <= 0)
 	{
+		printf("\nkill\n");
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		pthread_kill(next->pthread, 77);
-		printf("\nkill\n");
 	}
 	return;
 }
