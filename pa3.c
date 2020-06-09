@@ -182,9 +182,9 @@ void release_mutex(struct mutex *mutex)
 
 	if (mutex->S <= 0)
 	{
-		printf("\nkill\n");
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
+		printf("\n%ld\n", next->pthread->__sig);
 		pthread_kill(next->pthread, 77);
 	}
 	return;
