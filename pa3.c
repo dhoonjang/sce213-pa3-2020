@@ -143,6 +143,11 @@ void acquire_mutex(struct mutex *mutex)
 	if (mutex->S < 0)
 	{
 		new->pthread = pthread_self();
+
+		if (list_empty(&mutex->Q))
+		{
+			printf("\nhell\n");
+		}
 		list_add_tail(&new->list, &mutex->Q);
 
 		printf("\nacquire-thread: %d\n", new->pthread);
@@ -171,10 +176,6 @@ void release_mutex(struct mutex *mutex)
 	printf("\nunlock: %d\n", mutex->S);
 	if (mutex->S <= 0)
 	{
-		if (list_empty(&mutex->Q))
-		{
-			printf("\nhell\n");
-		}
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		printf("\nkill-thread: %d\n", next->pthread);
