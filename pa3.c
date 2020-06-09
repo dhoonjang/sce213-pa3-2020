@@ -137,7 +137,7 @@ void acquire_mutex(struct mutex *mutex)
 	sigemptyset(&mask);
 	sigaddset(&mask, 77);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-
+	printf("sss\n");
 	while (1)
 	{
 		if (sigwaitinfo(&mask, &info) == -1)
