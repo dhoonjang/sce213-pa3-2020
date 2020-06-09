@@ -143,7 +143,7 @@ void acquire_mutex(struct mutex *mutex)
 	sigset_t mask;
 	siginfo_t info;
 	pthread_t pt;
-	struct thread *t;
+	struct thread *t = malloc(sizeof(struct thread));
 	struct thread *new = malloc(sizeof(struct thread));
 
 	list_for_each_entry(t, &mutex->Q, list)
@@ -154,6 +154,7 @@ void acquire_mutex(struct mutex *mutex)
 			break;
 		}
 	}
+
 	mutex->S--;
 	if (mutex->S < 0)
 	{
