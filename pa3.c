@@ -91,7 +91,7 @@ struct thread
 
 struct mutex
 {
-	struct thread *head;
+	struct list_head Q;
 	int S;
 };
 
@@ -137,7 +137,7 @@ void acquire_mutex(struct mutex *mutex)
 	if (mutex->S < 0)
 	{
 		new->pthread = pthread_self();
-		list_add(&new->list, &mutex->head->list);
+		list_add(&new->list, &mutex->Q);
 
 		sigemptyset(&mask);
 		sigaddset(&mask, 77);
@@ -176,7 +176,7 @@ void release_mutex(struct mutex *mutex)
 
 	if (mutex->S <= 0)
 	{
-		next = list_first_entry(&mutex->head->list, struct thread, list);
+		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		pthread_kill(next->pthread, 77);
 	}
