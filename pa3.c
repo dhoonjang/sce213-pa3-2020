@@ -139,6 +139,7 @@ void acquire_mutex(struct mutex *mutex)
 	struct thread *new = malloc(sizeof(struct thread));
 
 	mutex->S--;
+	printf("\nlock: %d\n", mutex->S);
 	if (mutex->S < 0)
 	{
 		sigemptyset(&mask);
@@ -170,6 +171,7 @@ void release_mutex(struct mutex *mutex)
 	struct thread *next;
 	mutex->S++;
 
+	printf("\nunlock: %d\n", mutex->S);
 	if (mutex->S <= 0)
 	{
 		if (list_empty(&mutex->Q))
@@ -178,8 +180,8 @@ void release_mutex(struct mutex *mutex)
 		}
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		printf("\n%d\n", mutex->S);
 		pthread_kill(next->pthread, 77);
+		printf("\nend\n");
 	}
 	return;
 }
