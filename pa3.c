@@ -101,8 +101,12 @@ struct mutex
  * DESCRIPTION
  *   Initialize the mutex instance pointed by @mutex.
  */
+
+LIST_HEAD(queue);
+
 void init_mutex(struct mutex *mutex)
 {
+	mutex->Q = queue;
 	mutex->S = 1;
 	return;
 }
