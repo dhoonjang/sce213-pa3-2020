@@ -34,7 +34,8 @@
  *********************************************************************/
 struct spinlock
 {
-	bool isLock;
+	bool interested[2];
+	int turn;
 };
 
 /*********************************************************************
@@ -45,8 +46,9 @@ struct spinlock
  */
 void init_spinlock(struct spinlock *lock)
 {
-	lock->isLock = false;
-
+	lock->interested[0] = false;
+	lock->interested[1] = false;
+	lock->turn = 0;
 	return;
 }
 
@@ -61,10 +63,11 @@ void init_spinlock(struct spinlock *lock)
  */
 void acquire_spinlock(struct spinlock *lock)
 {
-	while (lock->isLock)
+	int other = 1 - lock->turn;
+	lock->interested[lock->turn] = true;
+	lock->turn = other;
+	while (lock->interested[lock->turn] && lock->turn == other)
 		;
-	lock->isLock = true;
-
 	return;
 }
 
@@ -79,7 +82,8 @@ void acquire_spinlock(struct spinlock *lock)
  */
 void release_spinlock(struct spinlock *lock)
 {
-	lock->isLock = false;
+	lock->interested[lock->turn] = false;
+
 	return;
 }
 
