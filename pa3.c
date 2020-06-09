@@ -148,7 +148,7 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
-		printf("\n%ld\n", new->pthread->__sig);
+		printf("\ntail\n");
 		while (1)
 		{
 			if (sigwaitinfo(&mask, &info) == -1)
@@ -184,7 +184,7 @@ void release_mutex(struct mutex *mutex)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		printf("\n%ld\n", next->pthread->__sig);
+		printf("\kill\n");
 		pthread_kill(next->pthread, 77);
 	}
 	return;
