@@ -148,9 +148,9 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
+		printf("\n%ld\n", new->pthread->__sig);
 		while (1)
 		{
-			printf("\n%d\n", info.si_signo);
 			if (sigwaitinfo(&mask, &info) == -1)
 			{
 				continue;
