@@ -131,6 +131,17 @@ void init_mutex(struct mutex *mutex)
  *      waiting list simultaneously, one waiters are going into the waiter list
  *      and the mutex holder tries to remove a waiter from the list, etc..)
  */
+
+void print_thread(struct mutex *mutex)
+{
+	struct thread *t;
+	list_for_each_entry(t, &mutex->Q, list)
+	{
+		printf("\nthread: %d", t->pthread);
+	}
+	printf("\nS: %d\n", mutex->S);
+}
+
 void acquire_mutex(struct mutex *mutex)
 {
 	sigset_t mask;
@@ -138,19 +149,14 @@ void acquire_mutex(struct mutex *mutex)
 	pthread_t pt;
 	struct thread *new = malloc(sizeof(struct thread));
 
+	print_thread(mutex);
 	mutex->S--;
-	printf("\nlock: %d\n", mutex->S);
 	if (mutex->S < 0)
 	{
 		new->pthread = pthread_self();
 
-		if (list_empty(&mutex->Q))
-		{
-			printf("\nhell\n");
-		}
 		list_add_tail(&new->list, &mutex->Q);
 
-		printf("\nacquire-thread: %d\n", new->pthread);
 		sigwait(&mask, NULL);
 		printf("\nacquire end\n");
 	}
@@ -171,9 +177,9 @@ void acquire_mutex(struct mutex *mutex)
 void release_mutex(struct mutex *mutex)
 {
 	struct thread *next;
-	mutex->S++;
 
-	printf("\nunlock: %d\n", mutex->S);
+	print_thread(mutex);
+	mutex->S++;
 	if (mutex->S <= 0)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
