@@ -155,6 +155,7 @@ void acquire_mutex(struct mutex *mutex)
 		}
 	}
 
+	printf("\nS: %d\n", mutex->S);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
