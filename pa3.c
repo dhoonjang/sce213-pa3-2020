@@ -148,6 +148,7 @@ void print_thread(struct mutex *mutex)
 void acquire_mutex(struct mutex *mutex)
 {
 	sigset_t mask;
+	int sig_no;
 	// siginfo_t info;
 	pthread_t pt;
 	struct thread *new = malloc(sizeof(struct thread));
@@ -161,7 +162,7 @@ void acquire_mutex(struct mutex *mutex)
 		list_add_tail(&new->list, &mutex->Q);
 
 		printf("\nadd: %d", new->pthread);
-		sigwait(&mask, NULL);
+		sigwait(&mask, &sig_no);
 		printf("\nacquire end\n");
 	}
 
