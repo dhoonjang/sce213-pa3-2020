@@ -103,7 +103,7 @@ struct mutex
  */
 void init_mutex(struct mutex *mutex)
 {
-	mutex->S = 0;
+	mutex->S = 1;
 	return;
 }
 
