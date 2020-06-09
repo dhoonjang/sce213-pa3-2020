@@ -91,6 +91,8 @@ struct thread
 
 struct mutex
 {
+	struct thread *t;
+	int S;
 };
 
 /*********************************************************************
@@ -126,6 +128,34 @@ void init_mutex(struct mutex *mutex)
  */
 void acquire_mutex(struct mutex *mutex)
 {
+	sigset_t mask;
+	siginfo_t info;
+	struct thread *new;
+	struct thread *next;
+	new->pthread = pthread_self();
+	list_add_tail(new, &mutex->t->list);
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGCHLD);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
+
+	while (1)
+	{
+		if (sigwaitinfo(&mask, &info) == -1)
+		{
+			continue;
+		}
+		switch (info.si_signo)
+		{
+		case 77:
+			break;
+		default:
+		}
+	}
+
+	next = list_first_entry(&mutex->t->list, struct thread, list);
+	mutex->t->pthread = next->pthread;
+
 	return;
 }
 
@@ -141,6 +171,7 @@ void acquire_mutex(struct mutex *mutex)
  */
 void release_mutex(struct mutex *mutex)
 {
+	pthread_kill(&mutex->t->pthread, 77);
 	return;
 }
 
