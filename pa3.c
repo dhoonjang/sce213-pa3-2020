@@ -144,11 +144,10 @@ void acquire_mutex(struct mutex *mutex)
 		{
 			continue;
 		}
-		switch (info.si_signo)
+		if (info.si_signo == 77)
 		{
-		case 77:
+
 			break;
-		default:
 		}
 	}
 
