@@ -86,7 +86,6 @@ void release_spinlock(struct spinlock *l)
 struct thread
 {
 	pthread_t pthread;
-	sigset_t mask;
 	struct list_head list;
 };
 
@@ -149,22 +148,23 @@ void print_thread(struct mutex *mutex)
 void acquire_mutex(struct mutex *mutex)
 {
 	int sig_no;
+	sigset_t mask;
 	struct thread *new = malloc(sizeof(struct thread));
 	// printf("\n\n//acquire//");
 	// print_thread(mutex);
 	mutex->S--;
 	if (mutex->S < 0)
 	{
-		sigemptyset(&new->mask);
-		sigaddset(&new->mask, SIGINT);
-		sigprocmask(SIG_BLOCK, &new->mask, NULL);
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
+		sigemptyset(&mask);
+		sigaddset(&mask, SIGINT);
+		sigprocmask(SIG_BLOCK, &mask, NULL);
 		// printf("\nadd: %d", new->pthread);
 		while (1)
 		{
-			sigwait(&new->mask, &sig_no);
+			sigwait(&mask, &sig_no);
 			// printf("\n%d", sig_no);
 			if (sig_no == SIGINT)
 			{
