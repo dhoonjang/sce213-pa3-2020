@@ -132,10 +132,11 @@ void acquire_mutex(struct mutex *mutex)
 	siginfo_t info;
 	struct thread *new;
 	new->pthread = pthread_self();
-	list_add_tail(&new->list, &mutex->head->list);
+	list_add(&new->list, &mutex->head->list);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, 77);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
 
 	while (1)
 	{
