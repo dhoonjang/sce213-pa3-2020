@@ -107,7 +107,7 @@ void init_mutex(struct mutex *mutex)
 	struct list_head *head = &mutex->Q;
 	head->next = head;
 	head->prev = head;
-	printf("\nstart %d\n", list_empty(&mutex->Q));
+	// printf("\nstart %d\n", list_empty(&mutex->Q));
 
 	mutex->S = 1;
 	return;
