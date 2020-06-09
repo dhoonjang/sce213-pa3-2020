@@ -156,8 +156,8 @@ void acquire_mutex(struct mutex *mutex)
 	if (mutex->S < 0)
 	{
 		sigemptyset(&mask);
-		sigaddset(&mask, 100);
-		sigprocmask(100, &mask, NULL);
+		sigaddset(&mask, SIGALRM);
+		sigprocmask(SIGALRM, &mask, NULL);
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
@@ -166,7 +166,7 @@ void acquire_mutex(struct mutex *mutex)
 		{
 			sigwait(&mask, &sig_no);
 			printf("\n%d", sig_no);
-			if (sig_no == 100)
+			if (sig_no == SIGALRM)
 				break;
 		}
 		// printf("\nacquire end\n");
@@ -196,7 +196,7 @@ void release_mutex(struct mutex *mutex)
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		// printf("\nkill-thread: %d\n", next->pthread);
-		pthread_kill(next->pthread, 100);
+		pthread_kill(next->pthread, SIGALRM);
 		// printf("\nrelease end\n");
 	}
 	return;
