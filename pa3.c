@@ -197,8 +197,6 @@ void release_mutex(struct mutex *mutex)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-
-		sigprocmask(SIG_UNBLOCK, &next->mask, NULL);
 		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
 		// printf("\nrelease end\n");
