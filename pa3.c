@@ -135,7 +135,7 @@ void acquire_mutex(struct mutex *mutex)
 	list_add_tail(&new->list, &mutex->head->list);
 
 	sigemptyset(&mask);
-	sigaddset(&mask, SIGCHLD);
+	sigaddset(&mask, 77);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
 
 	while (1)
