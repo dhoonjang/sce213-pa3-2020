@@ -137,13 +137,12 @@ void acquire_mutex(struct mutex *mutex)
 	if (mutex->S < 0)
 	{
 		new->pthread = pthread_self();
-		list_add(&new->list, &mutex->Q);
-
+		list_add_tail(&new->list, &mutex->Q);
 		printf("\n\nhaha\n\n");
+
 		sigemptyset(&mask);
 		sigaddset(&mask, 77);
 		sigprocmask(SIG_BLOCK, &mask, NULL);
-
 		while (1)
 		{
 			if (sigwaitinfo(&mask, &info) == -1)
