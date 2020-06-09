@@ -66,7 +66,7 @@ void acquire_spinlock(struct spinlock *lock)
 	int other = 1 - lock->turn;
 	lock->interested[lock->turn] = true;
 	lock->turn = other;
-	while (lock->interested[lock->turn] && lock->turn == other)
+	while (lock->interested[other] && lock->turn == other)
 		;
 	return;
 }
@@ -83,7 +83,6 @@ void acquire_spinlock(struct spinlock *lock)
 void release_spinlock(struct spinlock *lock)
 {
 	lock->interested[lock->turn] = false;
-
 	return;
 }
 
