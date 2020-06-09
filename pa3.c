@@ -164,7 +164,7 @@ void acquire_mutex(struct mutex *mutex)
 		// printf("\nadd: %d", new->pthread);
 		while (1)
 		{
-			if (sigwait(&mask, &sig_no) < 0)
+			if (sigwait(&mask, &sig_no) != 0)
 			{
 				continue;
 			}
