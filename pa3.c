@@ -204,15 +204,16 @@ void release_mutex(struct mutex *mutex)
 	while (compare_and_swap(&mutex->held, 0, 1))
 		;
 	mutex->S++;
-	mutex->held = 0;
 	if (mutex->S <= 0)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
+		mutex->held = 0;
 		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
 		// printf("\nrelease end\n");
 	}
+	mutex->held = 0;
 	return;
 }
 
@@ -224,13 +225,13 @@ struct ringbuffer
 	/** NEVER CHANGE @nr_slots AND @slots ****/
 	/**/ int nr_slots; /**/
 	/**/ int *slots;	 /**/
+	int held;
 	int count;
 	int out;
 	int in; /*****************************************/
 };
 
 struct ringbuffer ringbuffer = {};
-int __lock = 0;
 
 /*********************************************************************
  * enqueue_into_ringbuffer(@value)
@@ -257,12 +258,12 @@ void enqueue_into_ringbuffer(int value)
 
 	while (ringbuffer.count == ringbuffer.nr_slots)
 		;
-	while (compare_and_swap(&__lock, 0, 1))
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
 	*(ringbuffer.slots + ringbuffer.in) = value;
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.count++;
-	__lock = 0;
+	ringbuffer.held = 0;
 }
 
 /*********************************************************************
@@ -295,11 +296,11 @@ int dequeue_from_ringbuffer(void)
 	while (ringbuffer.count == 0)
 		;
 	pop = *(ringbuffer.slots + ringbuffer.out);
-	while (compare_and_swap(&__lock, 0, 1))
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
 	ringbuffer.out = (ringbuffer.out + 1) % ringbuffer.nr_slots;
 	ringbuffer.count++;
-	__lock = 0;
+	ringbuffer.held = 0;
 	return pop;
 }
 
@@ -333,11 +334,9 @@ int init_ringbuffer(const int nr_slots)
 	/**/ ringbuffer.nr_slots = nr_slots;										/**/
 	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots); /**/
 	/***********************************************************/
-	while (compare_and_swap(&__lock, 0, 1))
-		;
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
-	__lock = 0;
+	ringbuffer.held = 0;
 	return 0;
 }
