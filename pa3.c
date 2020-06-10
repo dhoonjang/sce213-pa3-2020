@@ -240,7 +240,6 @@ struct ringbuffer ringbuffer = {};
  */
 void enqueue_into_ringbuffer(int value)
 {
-	/*
 again:
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
@@ -255,7 +254,8 @@ again:
 	ringbuffer.count++;
 	ringbuffer.held = 0;
 	return;
-	*/
+
+	/*
 	while ((ringbuffer.in + 1) % ringbuffer.nr_slots == ringbuffer.out)
 		;
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
@@ -263,7 +263,7 @@ again:
 	*(ringbuffer.slots + ringbuffer.in) = value;
 	// printf("value: %d\n", value);
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
-	ringbuffer.held = 0;
+	ringbuffer.held = 0;*/
 }
 
 /*********************************************************************
@@ -277,7 +277,6 @@ again:
  */
 int dequeue_from_ringbuffer(void)
 {
-	/*
 	int pop;
 again:
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
@@ -293,7 +292,7 @@ again:
 	ringbuffer.count--;
 	ringbuffer.held = 0;
 	return pop;
-	*/
+	/*
 	while (ringbuffer.in == ringbuffer.out)
 		;
 	int pop = *(ringbuffer.slots + ringbuffer.out);
@@ -303,6 +302,7 @@ again:
 	ringbuffer.out = (ringbuffer.out + 1) % ringbuffer.nr_slots;
 	ringbuffer.held = 0;
 	return pop;
+*/
 }
 
 /*********************************************************************
