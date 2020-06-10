@@ -256,9 +256,11 @@ again:
 	ringbuffer.held = 0;
 	return;
 	*/
-	while ((ringbuffer.in + 1) % ringbuffer.nr_slots == ringbuffer.out && compare_and_swap(&ringbuffer.held, 0, 1))
+	while ((ringbuffer.in + 1) % ringbuffer.nr_slots == ringbuffer.out)
 		;
 	*(ringbuffer.slots + ringbuffer.in) = value;
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.held = 0;
 }
