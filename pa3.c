@@ -277,7 +277,12 @@ int dequeue_from_ringbuffer(void)
  */
 void fini_ringbuffer(void)
 {
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
 	free(ringbuffer.slots);
+	ringbuffer.in = 0;
+	ringbuffer.out = 0;
+	ringbuffer.held = 0;
 }
 
 /*********************************************************************
