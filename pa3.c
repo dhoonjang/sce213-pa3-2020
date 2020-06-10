@@ -93,6 +93,7 @@ struct mutex
 {
 	struct list_head Q;
 	int S;
+	int held;
 };
 
 /*********************************************************************
@@ -108,7 +109,7 @@ void init_mutex(struct mutex *mutex)
 	head->next = head;
 	head->prev = head;
 	// printf("\nstart %d\n", list_empty(&mutex->Q));
-
+	mutex->held = 0;
 	mutex->S = 1;
 	return;
 }
@@ -152,7 +153,10 @@ void acquire_mutex(struct mutex *mutex)
 	struct thread *new = malloc(sizeof(struct thread));
 	// printf("\n\n//acquire//");
 	// print_thread(mutex);
+	while (compare_and_swap(&mutex->held, 0, 1))
+		;
 	mutex->S--;
+	mutex->held = 0;
 	if (mutex->S < 0)
 	{
 		sigemptyset(&mask);
@@ -195,7 +199,11 @@ void release_mutex(struct mutex *mutex)
 	struct thread *next;
 	// printf("\n\n//release//");
 	// print_thread(mutex);
+
+	while (compare_and_swap(&mutex->held, 0, 1))
+		;
 	mutex->S++;
+	mutex->held = 0;
 	if (mutex->S <= 0)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
