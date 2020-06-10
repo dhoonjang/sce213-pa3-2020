@@ -230,7 +230,7 @@ struct ringbuffer
 };
 
 struct ringbuffer ringbuffer = {};
-int __lock;
+int __lock = 0;
 
 /*********************************************************************
  * enqueue_into_ringbuffer(@value)
