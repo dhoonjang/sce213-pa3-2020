@@ -237,6 +237,7 @@ struct ringbuffer ringbuffer = {};
  */
 void enqueue_into_ringbuffer(int value)
 {
+	ringbuffer.nr_slots = value;
 }
 
 /*********************************************************************
