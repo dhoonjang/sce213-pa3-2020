@@ -156,7 +156,6 @@ void acquire_mutex(struct mutex *mutex)
 	while (compare_and_swap(&mutex->held, 0, 1))
 		;
 	mutex->S--;
-	mutex->held = 0;
 	if (mutex->S < 0)
 	{
 		sigemptyset(&mask);
@@ -164,7 +163,7 @@ void acquire_mutex(struct mutex *mutex)
 		sigprocmask(SIG_BLOCK, &mask, NULL);
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
-
+		mutex->held = 0;
 		// printf("\nadd: %d", new->pthread);
 		while (1)
 		{
