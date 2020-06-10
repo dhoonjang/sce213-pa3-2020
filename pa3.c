@@ -251,7 +251,7 @@ void enqueue_into_ringbuffer(int value)
  */
 int dequeue_from_ringbuffer(void)
 {
-	return 0;
+	return ringbuffer.nr_slots;
 }
 
 /*********************************************************************
