@@ -174,13 +174,15 @@ void acquire_mutex(struct mutex *mutex)
 			}
 			if (sig_no == SIGINT)
 			{
+				while (compare_and_swap(&mutex->held, 0, 1))
+					;
 				sigprocmask(SIG_UNBLOCK, &mask, NULL);
 				break;
 			}
 		}
 		// printf("\nacquire end\n");
 	}
-
+	mutex->held = 0;
 	return;
 }
 
