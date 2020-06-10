@@ -292,7 +292,6 @@ again:
 void fini_ringbuffer(void)
 {
 	free(ringbuffer.slots);
-	ringbuffer.held = 0;
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
