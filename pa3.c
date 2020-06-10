@@ -243,7 +243,7 @@ void enqueue_into_ringbuffer(int value)
 again:
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
-	if (ringbuffer.count == ringbuffer.nr_slots)
+	if (ringbuffer.count == ringbuffer.nr_slots - 1)
 	{
 		ringbuffer.held = 0;
 		goto again;
