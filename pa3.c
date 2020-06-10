@@ -244,7 +244,7 @@ void enqueue_into_ringbuffer(int value)
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
 	*(ringbuffer.slots + ringbuffer.in) = value;
-	// printf("value: %d\n", value);
+	printf("value: %d\n", value);
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.held = 0;
 }
