@@ -147,8 +147,11 @@ void print_thread(struct mutex *mutex)
 
 void acquire_mutex(struct mutex *mutex)
 {
-	int sig_no;
 	sigset_t mask;
+	int sig_no;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
 	struct thread *new = malloc(sizeof(struct thread));
 	// printf("\n\n//acquire//");
 	// print_thread(mutex);
@@ -158,9 +161,7 @@ void acquire_mutex(struct mutex *mutex)
 		new->pthread = pthread_self();
 		list_add_tail(&new->list, &mutex->Q);
 
-		sigemptyset(&mask);
-		sigaddset(&mask, SIGINT);
-		// sigprocmask(SIG_BLOCK, &mask, NULL);
+		sigprocmask(SIG_UNBLOCK, &mask, NULL);
 		// printf("\nadd: %d", new->pthread);
 		while (1)
 		{
