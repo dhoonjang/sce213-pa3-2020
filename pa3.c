@@ -224,7 +224,9 @@ struct ringbuffer
 	/** NEVER CHANGE @nr_slots AND @slots ****/
 	/**/ int nr_slots; /**/
 	/**/ int *slots;	 /**/
-										 /*****************************************/
+	int held;
+	int out;
+	int in; /*****************************************/
 };
 
 struct ringbuffer ringbuffer = {};
@@ -237,7 +239,13 @@ struct ringbuffer ringbuffer = {};
  */
 void enqueue_into_ringbuffer(int value)
 {
-	ringbuffer.nr_slots = value;
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
+	*(ringbuffer.slots + ringbuffer.in * sizeof(int)) = value;
+	ringbuffer.in++;
+	if (ringbuffer.in == ringbuffer.nr_slots)
+		ringbuffer.in = 0;
+	ringbuffer.held = 0;
 }
 
 /*********************************************************************
@@ -251,7 +259,14 @@ void enqueue_into_ringbuffer(int value)
  */
 int dequeue_from_ringbuffer(void)
 {
-	return ringbuffer.nr_slots;
+	int pop = *(ringbuffer.slots + ringbuffer.out * sizeof(int));
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
+	ringbuffer.out++;
+	if (ringbuffer.out == ringbuffer.nr_slots)
+		ringbuffer.out = 0;
+	ringbuffer.held = 0;
+	return pop;
 }
 
 /*********************************************************************
@@ -281,6 +296,8 @@ int init_ringbuffer(const int nr_slots)
 	/**/ ringbuffer.nr_slots = nr_slots;										/**/
 	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots); /**/
 	/***********************************************************/
-
+	ringbuffer.held = 0;
+	ringbuffer.in = 0;
+	ringbuffer.out = 0;
 	return 0;
 }
