@@ -258,9 +258,9 @@ again:
 	*/
 	while ((ringbuffer.in + 1) % ringbuffer.nr_slots == ringbuffer.out)
 		;
-	*(ringbuffer.slots + ringbuffer.in) = value;
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
+	*(ringbuffer.slots + ringbuffer.in) = value;
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.held = 0;
 }
@@ -316,6 +316,7 @@ void fini_ringbuffer(void)
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
+	ringbuffer.held = 0;
 }
 
 /*********************************************************************
