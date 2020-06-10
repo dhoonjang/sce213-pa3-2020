@@ -333,6 +333,8 @@ int init_ringbuffer(const int nr_slots)
 	/**/ ringbuffer.nr_slots = nr_slots;										/**/
 	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots); /**/
 	/***********************************************************/
+	while (compare_and_swap(&__lock, 0, 1))
+		;
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
