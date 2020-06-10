@@ -243,16 +243,17 @@ void enqueue_into_ringbuffer(int value)
 again:
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
-	if (ringbuffer.count == ringbuffer.nr_slots - 1)
+	if (ringbuffer.count == ringbuffer.nr_slots)
 	{
 		ringbuffer.held = 0;
 		goto again;
 	}
 	*(ringbuffer.slots + ringbuffer.in) = value;
-	// printf("value: %d\n", value);
+	printf("value: %d\n", value);
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.count++;
 	ringbuffer.held = 0;
+	return;
 }
 
 /*********************************************************************
@@ -275,7 +276,7 @@ again:
 		goto again;
 	};
 	int pop = *(ringbuffer.slots + ringbuffer.out);
-	// printf("pop: %d\n", pop);
+	printf("pop: %d\n", pop);
 	ringbuffer.out = (ringbuffer.out + 1) % ringbuffer.nr_slots;
 	ringbuffer.count--;
 	ringbuffer.held = 0;
@@ -313,9 +314,9 @@ int init_ringbuffer(const int nr_slots)
 	/**/ ringbuffer.nr_slots = nr_slots;										/**/
 	/**/ ringbuffer.slots = malloc(sizeof(int) * nr_slots); /**/
 	/***********************************************************/
-	ringbuffer.held = 0;
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
+	ringbuffer.held = 0;
 	return 0;
 }
