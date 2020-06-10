@@ -104,16 +104,17 @@ static void __print_usage(const char *argv0)
 	printf("\n");
 }
 
-
-int parse_options(int argc, char * const argv[])
+int parse_options(int argc, char *const argv[])
 {
 	char opt;
 	bool test_locks = false;
 	bool test_ringbuffer = false;
 	enum lock_types lock_type = lock_spinlock;
 
-	while ((opt = getopt(argc, argv, "vqg:s:n:RrSml012h?")) != -1) {
-		switch(opt) {
+	while ((opt = getopt(argc, argv, "vqg:s:n:RrSml012h?")) != -1)
+	{
+		switch (opt)
+		{
 		case 'v':
 			verbose = 1;
 			break;
@@ -174,11 +175,13 @@ int parse_options(int argc, char * const argv[])
 		}
 	}
 
-	if (!test_locks && !test_ringbuffer) {
+	if (!test_locks && !test_ringbuffer)
+	{
 		__print_usage(argv[0]);
 		return EXIT_FAILURE;
 	}
-	if (test_locks) {
+	if (test_locks)
+	{
 		test_lock(lock_type);
 		exit(0);
 	}
@@ -189,9 +192,12 @@ void compare_results(unsigned long generated_values[], unsigned long counted_val
 {
 	bool mismatch = false;
 
-	for (int i = MIN_VALUE; i < MAX_VALUE; i++) {
-		if (generated_values[i] != counted_values[i]) {
-			if (!mismatch) {
+	for (int i = MIN_VALUE; i < MAX_VALUE; i++)
+	{
+		if (generated_values[i] != counted_values[i])
+		{
+			if (!mismatch)
+			{
 				mismatch = true;
 				printf(">>> Mismatching in generation and counting!!! <<<\n");
 				printf("     -----------------------------\n");
@@ -199,7 +205,7 @@ void compare_results(unsigned long generated_values[], unsigned long counted_val
 				printf("     -----------------------------\n");
 			}
 			fprintf(stderr, "      %4d : %8lu != %-8lu\n",
-					i,generated_values[i], counted_values[i]);
+							i, generated_values[i], counted_values[i]);
 		}
 	}
 
@@ -208,7 +214,7 @@ void compare_results(unsigned long generated_values[], unsigned long counted_val
 	printf("\n");
 }
 
-int main(int argc, char * const argv[])
+int main(int argc, char *const argv[])
 {
 	int retval = EXIT_SUCCESS;
 	unsigned long generated_values[MAX_VALUE] = {0};
@@ -228,16 +234,19 @@ int main(int argc, char * const argv[])
 	__print_message("                                    2020 Spring\n");
 	__print_message("\n");
 
-	if ((retval = parse_options(argc, argv))) {
+	if ((retval = parse_options(argc, argv)))
+	{
 		goto exit;
 	}
-	if ((retval = __init_rb(nr_slots))) {
+	if ((retval = __init_rb(nr_slots)))
+	{
 		goto exit;
 	}
 
 	nr_requests_to_generate = nr_generate * nr_generators;
 
-	if ((retval = spawn_counter(counter_type, nr_requests_to_generate))) {
+	if ((retval = spawn_counter(counter_type, nr_requests_to_generate)))
+	{
 		goto exit_ring;
 	}
 
@@ -247,16 +256,16 @@ int main(int argc, char * const argv[])
 	do_generate();
 	gettimeofday(&end, NULL);
 	elapsed = (end.tv_sec * 1000000 + end.tv_usec) -
-				(start.tv_sec * 1000000 + start.tv_usec);
+						(start.tv_sec * 1000000 + start.tv_usec);
 
 	fini_generators(generated_values);
 	fini_counter(counted_values);
 
 	compare_results(generated_values, counted_values);
-	printf(         "     # of requests : %lu\n", nr_requests_to_generate);
-	printf(         "  Time to complete : %lu.%06lu\n", elapsed / 1000000, elapsed % 1000000);
+	printf("     # of requests : %lu\n", nr_requests_to_generate);
+	printf("  Time to complete : %lu.%06lu\n", elapsed / 1000000, elapsed % 1000000);
 	fprintf(stderr, "       Performance : %lu req/sec\n",
-			nr_requests_to_generate * 1000000 / elapsed);
+					nr_requests_to_generate * 1000000 / elapsed);
 	printf("\n");
 
 exit_ring:
