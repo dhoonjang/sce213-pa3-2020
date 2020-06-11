@@ -203,14 +203,13 @@ void release_mutex(struct mutex *mutex)
 	while (compare_and_swap(&mutex->held, 0, 1))
 		;
 	mutex->S++;
+	mutex->held = 0;
 	if (mutex->S <= 0)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		mutex->held = 0;
 		pthread_kill(next->pthread, SIGINT);
 	}
-	mutex->held = 0;
 	return;
 }
 
