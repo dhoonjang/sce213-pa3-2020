@@ -149,7 +149,7 @@ void acquire_mutex(struct mutex *mutex)
 {
 	sigset_t mask;
 	int sig_no;
-	struct thread *new = malloc(sizeof(struct thread));
+	struct thread *new;
 	// printf("\n\n//acquire//");
 	// print_thread(mutex);
 	while (compare_and_swap(&mutex->held, 0, 1))
@@ -157,6 +157,7 @@ void acquire_mutex(struct mutex *mutex)
 	mutex->S--;
 	if (mutex->S < 0)
 	{
+		new = malloc(sizeof(struct thread));
 		sigemptyset(&mask);
 		sigaddset(&mask, SIGINT);
 		sigprocmask(SIG_BLOCK, &mask, NULL);
@@ -174,13 +175,12 @@ void acquire_mutex(struct mutex *mutex)
 			{
 				while (compare_and_swap(&mutex->held, 0, 1))
 					;
+				free(new);
 				sigprocmask(SIG_UNBLOCK, &mask, NULL);
 				break;
 			}
 		}
-		// printf("\nacquire end\n");
 	}
-	free(new);
 	mutex->held = 0;
 	return;
 }
@@ -200,7 +200,6 @@ void release_mutex(struct mutex *mutex)
 	struct thread *next;
 	// printf("\n\n//release//");
 	// print_thread(mutex);
-
 	while (compare_and_swap(&mutex->held, 0, 1))
 		;
 	mutex->S++;
@@ -209,9 +208,7 @@ void release_mutex(struct mutex *mutex)
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
 		mutex->held = 0;
-		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
-		// printf("\nrelease end\n");
 	}
 	mutex->held = 0;
 	return;
