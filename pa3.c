@@ -176,11 +176,11 @@ void acquire_mutex(struct mutex *mutex)
 				while (compare_and_swap(&mutex->held, 0, 1))
 					;
 				free(new);
-				sigprocmask(SIG_UNBLOCK, &mask, NULL);
 				break;
 			}
 		}
 	}
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	mutex->held = 0;
 	return;
 }
