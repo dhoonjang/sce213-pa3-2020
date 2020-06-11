@@ -300,7 +300,6 @@ int dequeue_from_ringbuffer(void)
 again:
 	while (ringbuffer.count == 0)
 		;
-	pop = *(ringbuffer.slots + ringbuffer.out);
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
 	if (ringbuffer.count == 0)
@@ -308,6 +307,7 @@ again:
 		ringbuffer.held = 0;
 		goto again;
 	}
+	pop = *(ringbuffer.slots + ringbuffer.out);
 	ringbuffer.out = (ringbuffer.out + 1) % ringbuffer.nr_slots;
 	ringbuffer.count--;
 	ringbuffer.held = 0;
