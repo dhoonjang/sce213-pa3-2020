@@ -174,6 +174,7 @@ void acquire_mutex(struct mutex *mutex)
 			{
 				while (compare_and_swap(&mutex->held, 0, 1))
 					;
+				free(new);
 				sigprocmask(SIG_UNBLOCK, &mask, NULL);
 				break;
 			}
@@ -207,7 +208,6 @@ void release_mutex(struct mutex *mutex)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
-		free(&next);
 		mutex->held = 0;
 		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
