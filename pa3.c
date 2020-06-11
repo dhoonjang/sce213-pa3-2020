@@ -255,24 +255,15 @@ void enqueue_into_ringbuffer(int value)
 	ringbuffer.count++;
 	ringbuffer.held = 0;
 	return; */
-	while (1)
+again:
+	while (ringbuffer.count == ringbuffer.nr_slots)
+		;
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
+	if (ringbuffer.count == ringbuffer.nr_slots)
 	{
-		if (compare_and_swap(&ringbuffer.held, 0, 1))
-		{
-			continue;
-		}
-		else
-		{
-			if (ringbuffer.count == ringbuffer.nr_slots)
-			{
-				ringbuffer.held = 0;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
+		ringbuffer.held = 0;
+		goto again;
 	}
 	*(ringbuffer.slots + ringbuffer.in) = value;
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
@@ -306,27 +297,17 @@ int dequeue_from_ringbuffer(void)
 	ringbuffer.count--;
 	ringbuffer.held = 0;
 	return pop; */
-
-	while (1)
-	{
-		if (compare_and_swap(&ringbuffer.held, 0, 1))
-		{
-			continue;
-		}
-		else
-		{
-			if (ringbuffer.count == 0)
-			{
-				ringbuffer.held = 0;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
+again:
+	while (ringbuffer.count == 0)
+		;
 	pop = *(ringbuffer.slots + ringbuffer.out);
+	while (compare_and_swap(&ringbuffer.held, 0, 1))
+		;
+	if (ringbuffer.count == 0)
+	{
+		ringbuffer.held = 0;
+		goto again;
+	}
 	ringbuffer.out = (ringbuffer.out + 1) % ringbuffer.nr_slots;
 	ringbuffer.count--;
 	ringbuffer.held = 0;
