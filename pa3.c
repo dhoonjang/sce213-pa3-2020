@@ -108,7 +108,6 @@ void init_mutex(struct mutex *mutex)
 	struct list_head *head = &mutex->Q;
 	head->next = head;
 	head->prev = head;
-	// printf("\nstart %d\n", list_empty(&mutex->Q));
 	mutex->held = 0;
 	mutex->S = 1;
 	return;
@@ -208,6 +207,7 @@ void release_mutex(struct mutex *mutex)
 	{
 		next = list_first_entry(&mutex->Q, struct thread, list);
 		list_del_init(&next->list);
+		free(&next);
 		mutex->held = 0;
 		// printf("\nkill-thread: %d\n", next->pthread);
 		pthread_kill(next->pthread, SIGINT);
