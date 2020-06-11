@@ -175,12 +175,12 @@ void acquire_mutex(struct mutex *mutex)
 			{
 				while (compare_and_swap(&mutex->held, 0, 1))
 					;
+				sigprocmask(SIG_UNBLOCK, &mask, NULL);
 				free(new);
 				break;
 			}
 		}
 	}
-	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	mutex->held = 0;
 	return;
 }
@@ -294,6 +294,7 @@ void fini_ringbuffer(void)
 	ringbuffer.in = 0;
 	ringbuffer.out = 0;
 	ringbuffer.count = 0;
+	ringbuffer.held = 0;
 }
 
 /*********************************************************************
