@@ -241,7 +241,7 @@ struct ringbuffer ringbuffer = {};
  */
 void enqueue_into_ringbuffer(int value)
 {
-again:
+	/* again:
 	while (compare_and_swap(&ringbuffer.held, 0, 1))
 		;
 	if (ringbuffer.count == ringbuffer.nr_slots)
@@ -254,7 +254,7 @@ again:
 	ringbuffer.in = (ringbuffer.in + 1) % ringbuffer.nr_slots;
 	ringbuffer.count++;
 	ringbuffer.held = 0;
-	return;
+	return; */
 
 	while (ringbuffer.count == ringbuffer.nr_slots)
 		;
