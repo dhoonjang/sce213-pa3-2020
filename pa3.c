@@ -292,7 +292,6 @@ int dequeue_from_ringbuffer(void)
 	ringbuffer.count--;
 	ringbuffer.held = 0;
 	return pop; */
-
 	while (ringbuffer.count == 0)
 		;
 	pop = *(ringbuffer.slots + ringbuffer.out);
